@@ -56,7 +56,11 @@ public class GoogleSettingsController extends BaseController {
         @Param("maxThreads") Integer maxThreads, @Param("fetchRetry") Integer fetchRetry,
         @Param("country") String country, @Param("datacenter") String datacenter,
         @Param("device") Integer device,
-        @Param("local") String local, @Param("custom") String custom
+        @Param("local") String local, @Param("custom") String custom,
+        @Param("googleApiKey") String googleApiKey,
+        @Param("googleCustomSearchEngineId") String googleCustomSearchEngineId,
+        @Param("useCustomSearchAPI") Boolean useCustomSearchAPI,
+        @Param("maxDailyApiQueries") Integer maxDailyApiQueries
     ){
         FlashScope flash = context.getFlashScope();
         
@@ -117,7 +121,21 @@ public class GoogleSettingsController extends BaseController {
             options.setDefaultCustomParameters(custom);
         } else {
             options.setDefaultCustomParameters(defaultOptions.getDefaultCustomParameters());
-        }        
+        }
+        
+        // Google Custom Search API settings
+        if(googleApiKey != null){
+            options.setGoogleApiKey(googleApiKey.isEmpty() ? null : googleApiKey);
+        }
+        if(googleCustomSearchEngineId != null){
+            options.setGoogleCustomSearchEngineId(googleCustomSearchEngineId.isEmpty() ? null : googleCustomSearchEngineId);
+        }
+        if(useCustomSearchAPI != null){
+            options.setUseCustomSearchAPI(useCustomSearchAPI);
+        }
+        if(maxDailyApiQueries != null && maxDailyApiQueries > 0){
+            options.setMaxDailyApiQueries(maxDailyApiQueries);
+        }
         
         
         googleDB.options.update(options);

@@ -1,0 +1,34 @@
+FROM maven:3.8-openjdk-8
+
+WORKDIR /app
+
+# プロジェクトファイルをコピー（依存関係キャッシュのため）
+COPY pom.xml .
+COPY core/pom.xml core/
+COPY scraper/pom.xml scraper/
+COPY web/pom.xml web/
+
+# 依存関係をダウンロード（キャッシュのため）
+RUN mvn dependency:go-offline -B || true
+
+# ソースコードをコピー
+COPY . .
+
+# codegenディレクトリを作成
+RUN mkdir -p core/codegen/h2
+
+# クエリビルダーを初期化（初回ビルド時のみ必要）
+RUN cd core && chmod +x scripts/sqlcodegen.sh && bash scripts/sqlcodegen.sh || echo "Codegen skipped"
+
+# ビルド（テストのコンパイルと実行をスキップ、依存関係を更新）
+RUN mvn clean install -Dmaven.test.skip=true -U
+
+# 作業ディレクトリをwebに変更
+WORKDIR /app/web
+
+# ポートを公開
+EXPOSE 7134
+
+# 開発モードで起動（起動前にコンパイル）
+CMD ["sh", "-c", "mvn compile && mvn ninja:run -Dninja.mainClass=serposcope.lifecycle.Daemon -Dninja.jvmArgs='-Dlogback.configurationFile=dev/logback-stdout.xml -Dserposcope.datadir=/var/tmp/serposcope -Dserposcope.db.options=;AUTO_SERVER=TRUE'"]
+

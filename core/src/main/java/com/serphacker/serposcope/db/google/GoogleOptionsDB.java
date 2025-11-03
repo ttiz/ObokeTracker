@@ -28,6 +28,13 @@ public class GoogleOptionsDB {
     private final static String DEFAULT_COUNTRY = "google.default.country";
     private final static String DEFAULT_CUSTOM_PARAMETERS = "google.default.custom";
     
+    private final static String GOOGLE_API_KEY = "google.api_key";
+    private final static String GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "google.custom_search_engine_id";
+    private final static String USE_CUSTOM_SEARCH_API = "google.use_custom_search_api";
+    private final static String MAX_DAILY_API_QUERIES = "google.max_daily_api_queries";
+    private final static String API_QUERIES_COUNT_DATE = "google.api_queries_count_date";
+    private final static String API_QUERIES_COUNT = "google.api_queries_count";
+    
     @Inject
     ConfigDB configDB;
     
@@ -46,6 +53,12 @@ public class GoogleOptionsDB {
         options.setDefaultLocal(configDB.get(DEFAULT_LOCAL, options.getDefaultLocal()));
         options.setDefaultCountry(configDB.get(DEFAULT_COUNTRY, null));
         options.setDefaultCustomParameters(configDB.get(DEFAULT_CUSTOM_PARAMETERS, options.getDefaultCustomParameters()));
+        
+        // Google Custom Search API settings
+        options.setGoogleApiKey(configDB.get(GOOGLE_API_KEY, options.getGoogleApiKey()));
+        options.setGoogleCustomSearchEngineId(configDB.get(GOOGLE_CUSTOM_SEARCH_ENGINE_ID, options.getGoogleCustomSearchEngineId()));
+        options.setUseCustomSearchAPI(configDB.getBoolean(USE_CUSTOM_SEARCH_API, options.isUseCustomSearchAPI()));
+        options.setMaxDailyApiQueries(configDB.getInt(MAX_DAILY_API_QUERIES, options.getMaxDailyApiQueries()));
         
         return options;
     }
@@ -69,6 +82,64 @@ public class GoogleOptionsDB {
         configDB.update(DEFAULT_COUNTRY, nullIfDefault(opts.getDefaultCountry().name(), def.getDefaultCountry().name()));
         configDB.update(DEFAULT_CUSTOM_PARAMETERS, nullIfDefault(opts.getDefaultCustomParameters(),def.getDefaultCustomParameters()));
         
+        // Google Custom Search API settings
+        configDB.update(GOOGLE_API_KEY, nullIfDefault(opts.getGoogleApiKey(), def.getGoogleApiKey()));
+        configDB.update(GOOGLE_CUSTOM_SEARCH_ENGINE_ID, nullIfDefault(opts.getGoogleCustomSearchEngineId(), def.getGoogleCustomSearchEngineId()));
+        configDB.updateBoolean(USE_CUSTOM_SEARCH_API, nullIfDefault(opts.isUseCustomSearchAPI(), def.isUseCustomSearchAPI()));
+        configDB.updateInt(MAX_DAILY_API_QUERIES, nullIfDefault(opts.getMaxDailyApiQueries(), def.getMaxDailyApiQueries()));
+        
+    }
+    
+    /**
+     * 今日のAPI使用回数を取得
+     * @return 今日のAPI使用回数
+     */
+    public int getTodayApiQueriesCount() {
+        String today = java.time.LocalDate.now().toString();
+        String storedDate = configDB.get(API_QUERIES_COUNT_DATE, null);
+        
+        // 日付が変わっていたら0にリセット
+        if (storedDate == null || !today.equals(storedDate)) {
+            return 0;
+        }
+        
+        return configDB.getInt(API_QUERIES_COUNT, 0);
+    }
+    
+    /**
+     * API使用回数を1回増やす
+     * 日付が変わっていたらリセットしてからカウント
+     * @return 更新後の今日の使用回数
+     */
+    public synchronized int incrementApiQueriesCount() {
+        String today = java.time.LocalDate.now().toString();
+        String storedDate = configDB.get(API_QUERIES_COUNT_DATE, null);
+        
+        int currentCount;
+        if (storedDate == null || !today.equals(storedDate)) {
+            // 日付が変わっていたらリセット
+            currentCount = 1;
+            configDB.update(API_QUERIES_COUNT_DATE, today);
+        } else {
+            currentCount = configDB.getInt(API_QUERIES_COUNT, 0) + 1;
+        }
+        
+        configDB.updateInt(API_QUERIES_COUNT, currentCount);
+        return currentCount;
+    }
+    
+    /**
+     * 今日のAPI使用回数が上限に達しているかチェック
+     * @param maxDailyQueries 1日の最大使用回数
+     * @return 上限に達している場合true
+     */
+    public boolean isApiQueriesLimitReached(int maxDailyQueries) {
+        int todayCount = getTodayApiQueriesCount();
+        return todayCount >= maxDailyQueries;
+    }
+    
+    protected Boolean nullIfDefault(Boolean value, Boolean def){
+        return (Boolean)nullIfDefaultObject(value, def);
     }
     
     protected Integer nullIfDefault(Integer value, Integer def){

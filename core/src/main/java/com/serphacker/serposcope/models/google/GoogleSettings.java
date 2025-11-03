@@ -27,6 +27,12 @@ public class GoogleSettings {
     GoogleDevice defaultDevice = GoogleDevice.DESKTOP;
     String defaultLocal = null;
     String defaultCustomParameters = null;
+    
+    // Google Custom Search API settings
+    String googleApiKey = null;
+    String googleCustomSearchEngineId = null;
+    boolean useCustomSearchAPI = false;
+    int maxDailyApiQueries = 50; // 1日の最大API使用回数（デフォルト50）
 
     public int getResultPerPage() {
         return resultPerPage;
@@ -145,6 +151,40 @@ public class GoogleSettings {
 
     public void setDefaultCustomParameters(String defaultCustomParameters) {
         this.defaultCustomParameters = defaultCustomParameters;
+    }
+    
+    // Google Custom Search API getters and setters
+    
+    public String getGoogleApiKey() {
+        return googleApiKey;
+    }
+
+    public void setGoogleApiKey(String googleApiKey) {
+        this.googleApiKey = googleApiKey;
+    }
+
+    public String getGoogleCustomSearchEngineId() {
+        return googleCustomSearchEngineId;
+    }
+
+    public void setGoogleCustomSearchEngineId(String googleCustomSearchEngineId) {
+        this.googleCustomSearchEngineId = googleCustomSearchEngineId;
+    }
+
+    public boolean isUseCustomSearchAPI() {
+        return useCustomSearchAPI;
+    }
+
+    public void setUseCustomSearchAPI(boolean useCustomSearchAPI) {
+        this.useCustomSearchAPI = useCustomSearchAPI;
+    }
+
+    public int getMaxDailyApiQueries() {
+        return maxDailyApiQueries;
+    }
+
+    public void setMaxDailyApiQueries(int maxDailyApiQueries) {
+        this.maxDailyApiQueries = maxDailyApiQueries;
     }
     
 }

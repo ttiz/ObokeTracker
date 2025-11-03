@@ -324,7 +324,8 @@ public class GoogleTask extends AbstractTask {
     protected GoogleScraper genScraper(){
         return googleScraperFactory.get(
             scrapClientFactory.get(httpUserAgent, httpTimeoutMS),
-            solver
+            solver,
+            googleOptions
         );
     }
 

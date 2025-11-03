@@ -1,0 +1,21 @@
+services:
+  serposcope:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "7134:7134"
+    volumes:
+      # ソースコードをマウントしてホットリロードを有効化
+      - ./core:/app/core
+      - ./scraper:/app/scraper
+      - ./web:/app/web
+      # データディレクトリを永続化
+      - serposcope-data:/var/tmp/serposcope
+    environment:
+      - SERPOSCOPE_DATADIR=/var/tmp/serposcope
+    container_name: serposcope-dev
+
+volumes:
+  serposcope-data:
+

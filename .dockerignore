@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+target/
+.mvn
+nb-configuration.xml
+nbproject/
+docker/
+*.log
+
+

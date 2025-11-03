@@ -15,4 +15,5 @@ import com.serphacker.serposcope.scraper.http.ScrapClient;
 @ImplementedBy(GoogleScraperFactoryImpl.class)
 public interface GoogleScraperFactory {
     public GoogleScraper get(ScrapClient http, CaptchaSolver solver);
+    public GoogleScraper get(ScrapClient http, CaptchaSolver solver, com.serphacker.serposcope.models.google.GoogleSettings settings);
 }
