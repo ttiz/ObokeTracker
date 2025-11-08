@@ -38,24 +38,8 @@ public class Scheduler {
     
     @Schedule(delay = 6, initialDelay = 0, timeUnit = TimeUnit.HOURS)
     public void checkForUpdate() throws UnsupportedEncodingException{
-        if(!props.isProd()){
-            return;
-        }
-        
-        String url = "https://serposcope.serphacker.com/update/check.php" +
-            "?uid=" + baseDB.config.get(ConfigDB.APP_INSTALLID, "") + 
-            "&version=" + Version.CURRENT + 
-            "&os=" + URLEncoder.encode(osVersion(), "utf-8");
-        
-        ScrapClient httpClient = new ScrapClient();
-        httpClient.get(url);
-        try  {
-            lastVersion = new Version(httpClient.getContentAsString().replaceAll("(^\\s+)|(\\s+$)", ""));
-            LOG.info("last version {} | current version {}", lastVersion, Version.CURRENT);
-        }catch(Exception ex){
-            LOG.warn("can't fetch last version from serphacker.com");
-        }
-        
+        // External communication removed
+        // Version checking disabled
     }
     
     protected String osVersion(){
