@@ -1,6 +1,9 @@
 終了済み
 https://github.com/ttiz/ObokeTracker/issues/4
 
+こちらが続編
+https://github.com/ttiz/Oboke-SEO-Tracker
+
 # LEGACY CODE DISCLAIMER
 
 Old application in survival mode. Bug won't be fixed and PR won't be merged.
